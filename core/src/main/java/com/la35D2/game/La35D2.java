@@ -1,13 +1,12 @@
 package com.la35D2.game;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Gdx;
-
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.la35D2.game.Jugador.NaveJugador;
 
 public class La35D2 extends Game {
     private SpriteBatch batch;
@@ -15,6 +14,8 @@ public class La35D2 extends Game {
     private BitmapFont font;     // Para mostrar texto
 
     private float playButtonX, playButtonY, playButtonWidth, playButtonHeight;
+
+    private com.la35D2.game.Player selectedPlayer;  // Nueva variable para guardar el jugador seleccionado
 
     @Override
     public void create() {
@@ -26,19 +27,44 @@ public class La35D2 extends Game {
         font.setColor(Color.WHITE); // Color blanco para el texto
 
         // Inicializamos las coordenadas y tamaños del botón "Play"
-        playButtonWidth = 400; // Doblamos el tamaño del botón
+        playButtonWidth = 400;
         playButtonHeight = 100;
-        playButtonX = Gdx.graphics.getWidth() / 2 - playButtonWidth / 2 + 75; // Mover 50 píxeles a la derecha
-        playButtonY = Gdx.graphics.getHeight() / 2 - 155; // Ajustamos la posición para mover los botones hacia abajo
+        playButtonX = Gdx.graphics.getWidth() / 2 - playButtonWidth / 2 + 75;
+        playButtonY = Gdx.graphics.getHeight() / 2 - 155;
+
+        // Cargar texturas para las naves
+        Texture texturaQuispe = new Texture("QuispePixel.png");
+        Texture texturaSoto = new Texture("SotoPixel.png");
+
+        // Crear las naves para los jugadores con la textura correspondiente
+        NaveJugador naveQuispe = new NaveJugador(400, 50, texturaQuispe);
+        NaveJugador naveSoto = new NaveJugador(400, 50, texturaSoto);
+
+        // Crear los jugadores
+        com.la35D2.game.Player playerQuispe = new com.la35D2.game.Player("Quispe", "QuispePixel.png", 400, 50, naveQuispe);
+        com.la35D2.game.Player playerSoto = new com.la35D2.game.Player("Soto", "SotoPixel.png", 400, 50, naveSoto);
+
+        // Configurar el jugador seleccionado (ejemplo con Quispe)
+        setSelectedPlayer(playerQuispe);
 
         // Cambiar la pantalla a MainMenuScreen
-        this.setScreen(new com.la35D2.game.MainMenuScreen(this));  // Pasamos 'this' para poder acceder a la instancia de 'La35D2' si es necesario
+        this.setScreen(new com.la35D2.game.MainMenuScreen(this));
+    }
+
+    // Método para establecer el jugador seleccionado
+    public void setSelectedPlayer(com.la35D2.game.Player player) {
+        this.selectedPlayer = player;
+    }
+
+    // Método para obtener el jugador seleccionado
+    public com.la35D2.game.Player getSelectedPlayer() {
+        return selectedPlayer;
     }
 
     @Override
     public void dispose() {
         batch.dispose();
         menuImage.dispose();
-        font.dispose();  // Liberamos la memoria de la fuente
+        font.dispose();
     }
 }
