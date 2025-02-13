@@ -32,6 +32,7 @@ public class La35D2 extends Game {
         playButtonX = Gdx.graphics.getWidth() / 2 - playButtonWidth / 2 + 75;
         playButtonY = Gdx.graphics.getHeight() / 2 - 155;
 
+        Globales.batch = new SpriteBatch();
         // Cargar texturas para las naves
         Texture texturaQuispe = new Texture("QuispePixel.png");
         Texture texturaSoto = new Texture("SotoPixel.png");

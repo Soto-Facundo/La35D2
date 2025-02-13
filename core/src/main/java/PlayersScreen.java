@@ -95,6 +95,12 @@ public class PlayersScreen implements Screen {
             font.setColor(Color.WHITE);
         }
         font.draw(batch, opciones[1], soto.getX() + 25, 150);
+        // Dibujar la nave y los rayos del jugador seleccionado
+
+        if (playerSeleccionado != null) {
+            playerSeleccionado.getNaveJugador().draw();
+        }
+
 
         batch.end();
 
@@ -122,7 +128,20 @@ public class PlayersScreen implements Screen {
             } else if (opc == 1) {
                 playerSeleccionado = soto;
             }
+            System.out.println("Jugador seleccionado: " + playerSeleccionado.getName());
             game.setScreen(new com.la35D2.game.GameMapScreen(game, playerSeleccionado));
+        }
+
+        // Disparar con la barra espaciadora
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            if (playerSeleccionado != null) {
+                playerSeleccionado.getNaveJugador().disparar(new Texture("rayo1.png")); // Pasa la textura del rayo
+            }
+        }
+
+        // Actualizar la nave y rayos
+        if (playerSeleccionado != null) {
+            playerSeleccionado.getNaveJugador().update(delta);
         }
     }
 

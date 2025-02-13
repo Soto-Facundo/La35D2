@@ -1,32 +1,35 @@
 package com.la35D2.game.Jugador;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+import com.la35D2.game.Globales;
 
 public class RayoJugador {
-    private float x, y;
-    private Texture textura;
-    private static final float VELOCIDAD = 300f;
+    private Sprite sprite;
+    private Vector2 position;
+    private float speed = 300f;
 
-    public RayoJugador(float x, float y, Texture textura) {
-        this.x = x;
-        this.y = y;
-        this.textura = textura;
+    public RayoJugador(float x, float y, Texture texture) {
+        this.sprite = new Sprite(texture);
+        this.position = new Vector2(x, y);
+        sprite.setPosition(position.x, position.y);
     }
 
-    public void actualizar(float delta) {
-        y += VELOCIDAD * delta;
+    public Vector2 getPosition() {
+        return position;
     }
 
-    public void dibujar(SpriteBatch batch) {
-        batch.draw(textura, x, y);
+    public void update(float delta) {
+        position.y += speed * delta;
+        sprite.setPosition(position.x, position.y);
     }
 
-    public float getY() {
-        return y;
+    public void draw() {
+        sprite.draw(Globales.batch);
     }
 
     public void dispose() {
-        textura.dispose();
+        sprite.getTexture().dispose();
     }
 }

@@ -1,59 +1,54 @@
 package com.la35D2.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.la35D2.game.Jugador.NaveJugador;
 
 public class GameScreen implements Screen {
-    private NaveJugador naveJugador;
     private SpriteBatch batch;
-
-    public GameScreen(com.la35D2.game.Player jugadorSeleccionado) {
-        // Usa la imagen del jugador seleccionado
-        naveJugador = new NaveJugador(400, 50, jugadorSeleccionado.getTexture());
-    }
+    private NaveJugador nave;
+    private Texture naveTexture; // Variable para la textura de la nave
 
     @Override
     public void show() {
         batch = new SpriteBatch();
+        Globales.batch = batch;
+
+        // Cargar la textura de la nave
+        naveTexture = new Texture("nave.png"); // Asegúrate de tener la imagen en la carpeta "assets"
+
+        // Crear la nave pasando la posición y la textura
+        nave = new NaveJugador(400, 50, naveTexture); // Pasar la textura al constructor
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            naveJugador.setMoverIzquierda(true);
-        } else {
-            naveJugador.setMoverIzquierda(false);
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            naveJugador.setMoverDerecha(true);
-        } else {
-            naveJugador.setMoverDerecha(false);
-        }
-
-        naveJugador.actualizar(delta); // 🔴 Asegúrate de que esta línea esté presente
-
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Limpiar la pantalla
         batch.begin();
-        naveJugador.dibujar(batch);
+        nave.update(delta); // Actualizar nave
+        nave.draw(); // Dibujar nave
         batch.end();
     }
 
-
     @Override
     public void dispose() {
-        naveJugador.dispose();
-        batch.dispose();
+        batch.dispose(); // Limpiar recursos
+        naveTexture.dispose(); // Liberar la textura de la nave
     }
 
-    // Métodos vacíos (necesarios para implementar Screen)
-    @Override public void resize(int width, int height) {}
-    @Override public void hide() {}
-    @Override public void pause() {}
-    @Override public void resume() {}
+    // Métodos vacíos obligatorios
+    @Override
+    public void resize(int width, int height) {}
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void hide() {}
 }

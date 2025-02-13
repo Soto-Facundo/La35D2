@@ -9,33 +9,29 @@ public class Player {
     private String name;
     private Texture texture;
     private float x, y;
-    private NaveJugador naveJugador;  // Campo para almacenar la nave del jugador
+    private NaveJugador naveJugador;
 
-    // Velocidad de movimiento (puedes ajustarla según lo necesites)
-    private float speed = 50f;  // Ajusta la velocidad según lo que necesites
+    private float speed = 200f; // Velocidad de movimiento
 
     public Player(String name, String texturePath, float x, float y, NaveJugador naveJugador) {
         this.name = name;
         this.x = x;
         this.y = y;
-        this.texture = new Texture(texturePath); // Cargar la textura
-        this.naveJugador = naveJugador;  // Almacenar la nave del jugador
+        this.texture = new Texture(texturePath);
+        this.naveJugador = naveJugador;
     }
 
     public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
     }
+
     public String getName() {
         return name;
     }
 
     public Texture getTexture() {
         return texture;
-    }
-
-    public void setTexture(Texture texture) {
-        this.texture = texture;
     }
 
     public float getX() {
@@ -50,25 +46,23 @@ public class Player {
         return naveJugador;
     }
 
-    // Actualización de la posición del jugador
     public void update(float delta) {
-        // Movimiento con las teclas de flecha
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            y += speed * delta;  // Mueve hacia arriba
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            y -= speed * delta;  // Mueve hacia abajo
-        }
+        // Movimiento solo en horizontal (izquierda/derecha)
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            x -= speed * delta;  // Mueve hacia la izquierda
+            x -= speed * delta;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            x += speed * delta;  // Mueve hacia la derecha
+            x += speed * delta;
         }
+
+        // Restringir el movimiento dentro de la pantalla
+        if (x < 0) x = 0;
+        if (x > 950 - texture.getWidth()) x = 950 - texture.getWidth();
     }
 
+    // Llamamos al dispose de la naveJugador para liberar sus recursos
     public void dispose() {
         texture.dispose();
-        naveJugador.dispose();  // Asegúrate de que la nave también se libere al finalizar
+        naveJugador.dispose(); // Aquí es donde ahora liberamos los recursos de la nave
     }
 }

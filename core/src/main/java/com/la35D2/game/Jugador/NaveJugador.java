@@ -1,74 +1,56 @@
 package com.la35D2.game.Jugador;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+import com.la35D2.game.Globales;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NaveJugador {
-    private float x, y;
-    private Texture textura;
-    private boolean moverIzquierda, moverDerecha;
-    private static final float VELOCIDAD = 200f; // Velocidad de movimiento en píxeles por segundo
+    private Sprite sprite;
+    private Vector2 position;
+    private float speed = 500f;
+    private List<RayoJugador> rayos; // Lista de rayos disparados
 
-    private Array<RayoJugador> rayos; // Lista de disparos
-    private Texture texturaRayo; // Imagen del disparo
-
-    public NaveJugador(float x, float y, Texture textura) {
-        this.x = x;
-        this.y = y;
-        this.textura = textura;
-        this.rayos = new Array<>();
-        this.texturaRayo = new Texture("rayo1.png"); // Asegúrate de tener esta imagen
+    public NaveJugador(float x, float y, Texture texture) {
+        this.sprite = new Sprite(texture);
+        this.position = new Vector2(x, y);
+        sprite.setPosition(position.x, position.y);
+        rayos = new ArrayList<>();
     }
 
-    public void setMoverIzquierda(boolean moverIzquierda) {
-        this.moverIzquierda = moverIzquierda;
+    public void disparar(Texture texturaRayo) {
+        System.out.println("Método disparar() ejecutado");  // Esto debería imprimir
+        RayoJugador nuevoRayo = new RayoJugador(position.x + sprite.getWidth() / 2, position.y, texturaRayo);
+        rayos.add(nuevoRayo);
+        System.out.println("Disparo creado en X: " + position.x + " Y: " + position.y);
+
     }
 
-    public void setMoverDerecha(boolean moverDerecha) {
-        this.moverDerecha = moverDerecha;
-    }
-
-    public void setDebeDisparar(boolean debeDisparar) {
-        if (debeDisparar) {
-            rayos.add(new RayoJugador(x + textura.getWidth() / 2, y + textura.getHeight(), texturaRayo));
-        }
-    }
-
-    public void actualizar(float delta) {
-        // Movimiento
-        if (moverIzquierda) x -= VELOCIDAD * delta;
-        if (moverDerecha) x += VELOCIDAD * delta;
-
-        // Restringir el movimiento dentro de la pantalla
-        if (x < 0) x = 0;
-        if (x > 800 - textura.getWidth()) x = 800 - textura.getWidth();
-
-        // Actualizar los disparos
+    public void update(float delta) {
         for (RayoJugador rayo : rayos) {
-            rayo.actualizar(delta);
-        }
-
-        // Eliminar los disparos que salgan de la pantalla
-        for (int i = rayos.size - 1; i >= 0; i--) {
-            if (rayos.get(i).getY() > 480) {
-                rayos.removeIndex(i);
-            }
+            rayo.update(delta);
         }
     }
 
-    public void dibujar(SpriteBatch batch) {
-        batch.draw(textura, x, y);
+    public void draw() {
+        sprite.draw(Globales.batch);
         for (RayoJugador rayo : rayos) {
-            rayo.dibujar(batch);
+            System.out.println("Dibujando rayo en X: " + rayo.getPosition().x + " Y: " + rayo.getPosition().y);
+            rayo.draw();
         }
+    }
+
+    public boolean isOffScreen() {
+        // Verificar si el rayo se ha ido fuera de la pantalla
+        return position.y > 480; // O cualquier valor basado en tu altura de pantalla
     }
 
     public void dispose() {
-        textura.dispose();
-        texturaRayo.dispose();
+        sprite.getTexture().dispose(); // Liberar la textura de la nave
         for (RayoJugador rayo : rayos) {
-            rayo.dispose();
+            rayo.dispose(); // Asegurarse de liberar también los recursos de los rayos
         }
     }
 }
