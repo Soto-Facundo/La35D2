@@ -14,6 +14,7 @@ public class RayoJugador {
         this.sprite = new Sprite(texture);
         this.position = new Vector2(x, y);
         sprite.setPosition(position.x, position.y);
+        sprite.setSize(sprite.getWidth() / 8, sprite.getHeight() / 8);
     }
 
     public Vector2 getPosition() {
@@ -21,7 +22,7 @@ public class RayoJugador {
     }
 
     public void update(float delta) {
-        position.y += speed * delta;
+        position.y += speed * delta; //mueve rayo hacia arriba
         sprite.setPosition(position.x, position.y);
     }
 
