@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.la35D2.game.Jugador.NaveJugador;
+import com.la35D2.game.enemigos.FormacionEnemigos;
 
 public class La35D2 extends Game {
     private SpriteBatch batch;
@@ -16,6 +17,10 @@ public class La35D2 extends Game {
     private float playButtonX, playButtonY, playButtonWidth, playButtonHeight;
 
     private com.la35D2.game.Player selectedPlayer;  // Nueva variable para guardar el jugador seleccionado
+
+    // Nuevas variables para enemigos
+    private FormacionEnemigos formacionEnemigos;
+    private Texture enemigoTexture;
 
     @Override
     public void create() {
@@ -48,8 +53,31 @@ public class La35D2 extends Game {
         // Configurar el jugador seleccionado (ejemplo con Quispe)
         setSelectedPlayer(playerQuispe);
 
+        // Cargar textura de los enemigos
+        enemigoTexture = new Texture("enemigo.png"); // Cambia a la ruta correcta de la textura del enemigo
+
+        // Crear la formación de enemigos
+        formacionEnemigos = new FormacionEnemigos(enemigoTexture, 3, 5, 100);  // 3 filas, 5 columnas, velocidad 100
+
         // Cambiar la pantalla a MainMenuScreen
         this.setScreen(new com.la35D2.game.MainMenuScreen(this));
+    }
+
+    @Override
+    public void render() {
+        super.render();
+
+        /* Actualizar enemigos
+        formacionEnemigos.update(Gdx.graphics.getDeltaTime());
+
+        // Renderizar la pantalla
+        batch.begin();
+        // Dibujar enemigos
+        formacionEnemigos.draw(batch);
+
+        // Aquí puedes agregar el código para dibujar la nave del jugador y otros elementos
+
+        batch.end(); */
     }
 
     // Método para establecer el jugador seleccionado
@@ -67,5 +95,6 @@ public class La35D2 extends Game {
         batch.dispose();
         menuImage.dispose();
         font.dispose();
+        enemigoTexture.dispose(); // Asegúrate de liberar la memoria de la textura del enemigo
     }
 }

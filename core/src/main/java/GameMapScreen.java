@@ -9,21 +9,28 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Input;
+import com.la35D2.game.enemigos.FormacionEnemigos;
 
 public class GameMapScreen implements Screen {
     private La35D2 game;
     private SpriteBatch batch;
     private Texture mapTexture;
-    private Player jugadorSeleccionado;
+    private com.la35D2.game.Player jugadorSeleccionado;
     private Texture rayoTexture;
 
     private OrthographicCamera camera;
     private Viewport viewport;
 
+    // Eliminamos la lista de enemigos fijos
+    // private ArrayList<com.la35D2.game.enemigos.Enemigo> enemigos;
+
+    // Nueva variable para la formación de enemigos con movimiento
+    private FormacionEnemigos formacionEnemigos;
+
     private static final float MAP_WIDTH = 1024f;
     private static final float MAP_HEIGHT = 768f;
 
-    public GameMapScreen(La35D2 game, Player jugadorSeleccionado) {
+    public GameMapScreen(La35D2 game, com.la35D2.game.Player jugadorSeleccionado) {
         this.game = game;
         this.jugadorSeleccionado = jugadorSeleccionado;
     }
@@ -43,25 +50,36 @@ public class GameMapScreen implements Screen {
         mapTexture = new Texture(Gdx.files.internal("mapa-pixilart.png"));
         rayoTexture = new Texture(Gdx.files.internal("rayo1.png"));
 
+        // Posicionar la nave del jugador en el centro inferior del mapa
         float centerX = (Gdx.graphics.getWidth() - jugadorSeleccionado.getTexture().getWidth()) / 2;
         float bottomY = 0;
-
         jugadorSeleccionado.setPosition(centerX, bottomY);
-
-        // Actualizamos la posición de la nave del jugador para que coincida
         jugadorSeleccionado.getNaveJugador().setPosition(centerX, bottomY);
+
+        //la formación de enemigos que se moverán, admeas aqui se puede agregar enemigos
+        Texture enemigoTexture = new Texture(Gdx.files.internal("enemigo.png"));
+        formacionEnemigos = new FormacionEnemigos(enemigoTexture, 3, 7, 100);
     }
 
     @Override
     public void render(float delta) {
-        // Procesar input
+        // Procesar input para disparar y mover la nave
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             jugadorSeleccionado.getNaveJugador().disparar(rayoTexture);
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            jugadorSeleccionado.getNaveJugador().setPosition(jugadorSeleccionado.getX() - 5, jugadorSeleccionado.getY());
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            jugadorSeleccionado.getNaveJugador().setPosition(jugadorSeleccionado.getX() + 5, jugadorSeleccionado.getY());
+        }
 
-        // Actualizar
+        // Actualizar la nave y sus rayos
         jugadorSeleccionado.update(delta);
         jugadorSeleccionado.getNaveJugador().update(delta);
+
+        // Actualizar la formación de enemigos con la lógica de movimiento
+        formacionEnemigos.update(delta);
 
         // Renderizar
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -71,22 +89,18 @@ public class GameMapScreen implements Screen {
         batch.begin();
         // Dibujar el mapa
         batch.draw(mapTexture, 0, 0, MAP_WIDTH, MAP_HEIGHT);
-
-        // Dibujar al jugador
-        batch.draw(jugadorSeleccionado.getTexture(),
-            jugadorSeleccionado.getX(),
-            jugadorSeleccionado.getY(),
-            150, 150);
-
-        // Dibujar la nave y sus rayos
+        // Dibujar la nave del jugador
         jugadorSeleccionado.getNaveJugador().draw();
-
+        // Dibujar la formación de enemigos en movimiento
+        formacionEnemigos.draw(batch);
         batch.end();
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
+        camera.position.set(MAP_WIDTH / 2, MAP_HEIGHT / 2, 0);
+        camera.update();
     }
 
     @Override
@@ -103,6 +117,6 @@ public class GameMapScreen implements Screen {
         batch.dispose();
         mapTexture.dispose();
         rayoTexture.dispose();
-        Globales.batch = null; // Limpiamos la referencia global
+        // Si la clase FormacionEnemigos tuviera recursos a liberar, se haría aquí
     }
 }
