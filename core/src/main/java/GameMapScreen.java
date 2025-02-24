@@ -74,7 +74,7 @@ public class GameMapScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        // Actualizar entradas y actualizaciones del jugador
+        // Actualizar entradas y el jugador
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             jugadorSeleccionado.getNaveJugador().disparar(rayoTexture);
         }
@@ -91,19 +91,19 @@ public class GameMapScreen implements Screen {
             formacionEnemigos.update(delta);
         }
 
-        // Incrementar el tiempo transcurrido
+        // Incrementar tiempo transcurrido
         tiempoTranscurrido += delta;
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
-        // --- Detección de colisiones entre rayos del jugador y enemigos/boss ---
+        // --- Detección de colisiones entre rayos del jugador y enemigos / boss ---
         Iterator<RayoJugador> iterRayos = jugadorSeleccionado.getNaveJugador().getRayos().iterator();
         while (iterRayos.hasNext()) {
             RayoJugador rayo = iterRayos.next();
 
-            // Verificar colisión con enemigos
+            // Colisión con enemigos
             Iterator<com.la35D2.game.enemigos.Enemigo> iterEnemigos = formacionEnemigos.getListaEnemigos().iterator();
             while (iterEnemigos.hasNext()) {
                 com.la35D2.game.enemigos.Enemigo enemigo = iterEnemigos.next();
@@ -115,30 +115,32 @@ public class GameMapScreen implements Screen {
                 }
             }
 
-            // Verificar colisión con el boss
+            // Colisión con el Boss
             if (boss != null && rayo.getBounds().overlaps(boss.getBounds())) {
                 System.out.println("¡Disparo impactó al Boss!");
                 boss.recibirDisparo();
                 System.out.println("Vida restante del Boss: " + boss.getVida());
                 iterRayos.remove();
                 if (boss.getVida() <= 0) {
-                    System.out.println("¡Boss eliminado!");
-                    boss = null;
+                    System.out.println("¡Boss derrotado!");
+                    // Calculamos puntaje y cambiamos a la pantalla WinScreen
+                    int score = calcularScore();
+                    game.setScreen(new WinScreen(game, score));
+                    return;
                 }
                 break;
             }
         }
         // --- Fin de detección de colisiones de rayos ---
 
-        // --- Si ya no hay enemigos y el boss aún no ha aparecido, crearlo ---
+        // --- Si ya no hay enemigos y el Boss aún no ha aparecido, crearlo ---
         if (formacionEnemigos.getListaEnemigos().isEmpty() && boss == null) {
             System.out.println("¡Todos los enemigos han sido derrotados! Aparece el Boss.");
-            // Ajusta la posición del boss para que esté dentro de la ventana:
             float bossY = Math.max(0, Math.min(MAP_HEIGHT - 100, MAP_HEIGHT - 350));
             boss = new BossJasinski(bossTexture, rayoBossTexture, MAP_WIDTH / 2, bossY);
             System.out.println("Boss Position -> X: " + boss.getX() + ", Y: " + boss.getY());
         }
-        // --- Fin creación del boss ---
+        // --- Fin de creación del Boss ---
 
         // --- Verificar colisión entre el jugador y los enemigos ---
         for (com.la35D2.game.enemigos.Enemigo enemigo : formacionEnemigos.getListaEnemigos()) {
@@ -162,6 +164,7 @@ public class GameMapScreen implements Screen {
                     if (impactosRecibidos >= 3) {
                         System.out.println("¡El jugador ha sido derrotado!");
                         game.setScreen(new GameOverScreen(game));
+                        return;
                     }
                 }
             }
@@ -175,24 +178,17 @@ public class GameMapScreen implements Screen {
         formacionEnemigos.draw(batch);
         batch.end();
 
-        // --- Dibujar y actualizar al boss (si existe) ---
+        // --- Dibujar y actualizar al Boss (si existe) ---
         if (boss != null) {
             boss.update(delta);
             batch.begin();
             boss.draw(batch);
             batch.end();
-
-            // Si el boss fue derrotado (aunque ya se debería haber cambiado la pantalla antes)
-            if (boss.getVida() <= 0) {
-                int score = calcularScore();
-                game.setScreen(new WinScreen(game, score));
-                return;
-            }
         }
     }
 
     private int calcularScore() {
-        return Math.max(0, 1000 - (int) (tiempoTranscurrido * 10)) + (unusedShots * 20);
+        return Math.max(0, 1000 - (int)(tiempoTranscurrido * 10)) + (unusedShots * 20);
     }
 
     @Override
