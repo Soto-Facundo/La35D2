@@ -25,27 +25,27 @@ public class FormacionEnemigos {
     }
 
     public void update(float delta) {
-        // Mover enemigos en bloque
+        if (enemigos.isEmpty()) {
+            return; // No hacer nada si la lista está vacía
+        }
+
+        // Mover todos los enemigos según la dirección
         for (com.la35D2.game.enemigos.Enemigo enemigo : enemigos) {
+            enemigo.setX(enemigo.getX() + (direccionDerecha ? 1 : -1) * velocidad);
             enemigo.update(delta);
         }
 
-        // Controlar dirección (derecha o izquierda)
+        // Cambiar dirección si alcanzan el borde
         if (direccionDerecha) {
             if (enemigos.get(enemigos.size() - 1).getX() > 950) {
                 direccionDerecha = false;
                 moveDown();
             }
         } else {
-            if (enemigos.get(0).getX() < 0) {
+            if (enemigos.get(0).getX() < 50) {
                 direccionDerecha = true;
                 moveDown();
             }
-        }
-
-        // Mover todos los enemigos según la dirección
-        for (com.la35D2.game.enemigos.Enemigo enemigo : enemigos) {
-            enemigo.setX(enemigo.getX() + (direccionDerecha ? 1 : -1) * velocidad);
         }
     }
 
@@ -61,12 +61,6 @@ public class FormacionEnemigos {
         }
     }
 
-    // Getter existente
-    public ArrayList<com.la35D2.game.enemigos.Enemigo> getEnemigos() {
-        return enemigos;
-    }
-
-    // Nuevo método getter para usar en GameMapScreen
     public ArrayList<com.la35D2.game.enemigos.Enemigo> getListaEnemigos() {
         return enemigos;
     }

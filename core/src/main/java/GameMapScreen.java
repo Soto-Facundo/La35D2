@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.SortedIntList;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Input;
@@ -14,9 +13,8 @@ import com.la35D2.game.Jugador.RayoJugador;
 import com.la35D2.game.enemigos.FormacionEnemigos;
 import com.la35D2.game.Jugador.NaveJugador;
 import com.la35D2.game.pantallas.GameOverScreen;
+import com.la35D2.game.enemigos.BossJasinski;
 import java.util.Iterator;
-import javax.swing.text.html.HTMLDocument;
-
 
 public class GameMapScreen implements Screen {
     private La35D2 game;
@@ -28,14 +26,12 @@ public class GameMapScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
 
-    // Eliminamos la lista de enemigos fijos
-    // private ArrayList<com.la35D2.game.enemigos.Enemigo> enemigos;
-
-    // Nueva variable para la formación de enemigos con movimiento
     private FormacionEnemigos formacionEnemigos;
-
     private static final float MAP_WIDTH = 1024f;
     private static final float MAP_HEIGHT = 768f;
+
+    private BossJasinski boss;
+    private Texture bossTexture;
 
     public GameMapScreen(La35D2 game, com.la35D2.game.Player jugadorSeleccionado) {
         this.game = game;
@@ -52,25 +48,23 @@ public class GameMapScreen implements Screen {
         camera.update();
 
         batch = new SpriteBatch();
-        Globales.batch = batch; // Inicializamos el SpriteBatch global
+        Globales.batch = batch;
 
         mapTexture = new Texture(Gdx.files.internal("mapa-pixilart.png"));
         rayoTexture = new Texture(Gdx.files.internal("rayo1.png"));
+        bossTexture = new Texture(Gdx.files.internal("jBossFase.png"));
 
-        // Posicionar la nave del jugador en el centro inferior del mapa
         float centerX = (Gdx.graphics.getWidth() - jugadorSeleccionado.getTexture().getWidth()) / 2;
         float bottomY = 0;
         jugadorSeleccionado.setPosition(centerX, bottomY);
         jugadorSeleccionado.getNaveJugador().setPosition(centerX, bottomY);
 
-        //la formación de enemigos que se moverán, admeas aqui se puede agregar enemigos
         Texture enemigoTexture = new Texture(Gdx.files.internal("enemigo.png"));
         formacionEnemigos = new FormacionEnemigos(enemigoTexture, 3, 7, 100);
     }
 
     @Override
     public void render(float delta) {
-        // Procesar input para disparar y mover la nave
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             jugadorSeleccionado.getNaveJugador().disparar(rayoTexture);
         }
@@ -81,55 +75,56 @@ public class GameMapScreen implements Screen {
             jugadorSeleccionado.getNaveJugador().setPosition(jugadorSeleccionado.getX() + 5, jugadorSeleccionado.getY());
         }
 
-        // Actualizar la nave y sus rayos
         jugadorSeleccionado.update(delta);
         jugadorSeleccionado.getNaveJugador().update(delta);
 
-        // Actualizar la formación de enemigos con la lógica de movimiento
-        formacionEnemigos.update(delta);
+        if (!formacionEnemigos.getListaEnemigos().isEmpty()) {
+            formacionEnemigos.update(delta);
+        }
 
-        // Renderizar
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        // Dibujar el mapa
         batch.draw(mapTexture, 0, 0, MAP_WIDTH, MAP_HEIGHT);
-        // Dibujar la nave del jugador
         jugadorSeleccionado.getNaveJugador().draw();
-        // Dibujar la formación de enemigos en movimiento
         formacionEnemigos.draw(batch);
         batch.end();
 
-        // Actualizar la formación de enemigos con la lógica de movimiento
-        formacionEnemigos.update(delta);
-
-// Comprobar colisiones entre la nave del jugador y cada enemigo
-        for (com.la35D2.game.enemigos.Enemigo enemigo : formacionEnemigos.getEnemigos()) {
+        for (com.la35D2.game.enemigos.Enemigo enemigo : formacionEnemigos.getListaEnemigos()) {
             if (jugadorSeleccionado.getNaveJugador().getBounds().overlaps(enemigo.getBounds())) {
                 System.out.println("¡Colisión detectada! GAME OVER");
                 game.setScreen(new GameOverScreen(game));
-                break;  // Opcional: detener el ciclo tras detectar la colisión
+                break;
             }
         }
 
         Iterator<RayoJugador> iterRayos = jugadorSeleccionado.getNaveJugador().getRayos().iterator();
         while (iterRayos.hasNext()) {
             RayoJugador rayo = iterRayos.next();
-
             Iterator<com.la35D2.game.enemigos.Enemigo> iterEnemigos = formacionEnemigos.getListaEnemigos().iterator();
             while (iterEnemigos.hasNext()) {
                 com.la35D2.game.enemigos.Enemigo enemigo = iterEnemigos.next();
-
                 if (rayo.getBounds().overlaps(enemigo.getBounds())) {
-                    iterEnemigos.remove(); // Eliminar enemigo
-                    iterRayos.remove(); // Eliminar rayo
-                    break; // Salir del loop porque ya eliminamos el enemigo
+                    iterEnemigos.remove();
+                    iterRayos.remove();
+                    break;
                 }
             }
         }
 
+        if (formacionEnemigos.getListaEnemigos().isEmpty() && boss == null) {
+            System.out.println("¡Todos los enemigos eliminados! Aparece el BossJasinski");
+            boss = new BossJasinski(bossTexture, MAP_WIDTH / 2 - 200, MAP_HEIGHT - 350);
+        }
+
+        if (boss != null) {
+            boss.update(delta);
+            batch.begin();
+            boss.draw(batch);
+            batch.end();
+        }
     }
 
     @Override
@@ -153,8 +148,6 @@ public class GameMapScreen implements Screen {
         batch.dispose();
         mapTexture.dispose();
         rayoTexture.dispose();
-        // Si la clase FormacionEnemigos tuviera recursos a liberar, se haría aquí
+        bossTexture.dispose();
     }
 }
-
-
