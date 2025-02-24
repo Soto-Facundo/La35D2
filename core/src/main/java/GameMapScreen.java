@@ -34,6 +34,9 @@ public class GameMapScreen implements Screen {
     private BossJasinski boss;
     private Texture bossTexture;
 
+    private int impactosRecibidos = 0;
+
+
     public GameMapScreen(La35D2 game, com.la35D2.game.Player jugadorSeleccionado) {
         this.game = game;
         this.jugadorSeleccionado = jugadorSeleccionado;
@@ -128,6 +131,45 @@ public class GameMapScreen implements Screen {
                 break;
             }
         }
+
+
+
+        // Verificar colisión entre el jugador y los enemigos
+        for (com.la35D2.game.enemigos.Enemigo enemigo : formacionEnemigos.getListaEnemigos()) {
+            if (enemigo.getBounds().overlaps(jugadorSeleccionado.getBounds())) {
+                System.out.println("¡El jugador ha sido tocado por un enemigo! GAME OVER");
+                game.setScreen(new GameOverScreen(game));
+                return; // Detener la ejecución para evitar más procesamiento
+            }
+        }
+
+
+
+
+
+        // Verificar colisión entre los rayos del Boss y el jugador
+        if (boss != null) {
+            Iterator<com.la35D2.game.enemigos.RayoBoss> iterDisparosBoss = boss.getDisparos().iterator();
+            while (iterDisparosBoss.hasNext()) {
+                com.la35D2.game.enemigos.RayoBoss rayoBoss = iterDisparosBoss.next();
+
+                if (rayoBoss.getBounds().overlaps(jugadorSeleccionado.getBounds())) {
+                    System.out.println("¡El jugador ha sido impactado por un rayo del Boss!");
+                    impactosRecibidos++;
+
+                    iterDisparosBoss.remove(); // Eliminar el rayo que impactó
+
+                    if (impactosRecibidos >= 3) {
+                        System.out.println("¡El jugador ha sido derrotado!");
+                        game.setScreen(new GameOverScreen(game));
+                    }
+                }
+            }
+        }
+
+
+
+
 
         // 🔹 **Dibujar el mapa y los elementos en pantalla**
         batch.begin();

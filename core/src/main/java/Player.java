@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.la35D2.game.Jugador.NaveJugador;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Player {
     private String name;
@@ -20,6 +21,12 @@ public class Player {
         this.texture = new Texture(texturePath);
         this.naveJugador = naveJugador;
     }
+
+
+    public Rectangle getBounds() {
+        return new Rectangle(getX(), getY(), getTexture().getWidth(), getTexture().getHeight());
+    }
+
 
     public void setPosition(float x, float y) {
         this.x = x;
