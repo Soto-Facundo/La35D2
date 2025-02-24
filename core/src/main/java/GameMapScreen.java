@@ -6,12 +6,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.SortedIntList;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Input;
+import com.la35D2.game.Jugador.RayoJugador;
 import com.la35D2.game.enemigos.FormacionEnemigos;
 import com.la35D2.game.Jugador.NaveJugador;
 import com.la35D2.game.pantallas.GameOverScreen;
+import java.util.Iterator;
+import javax.swing.text.html.HTMLDocument;
 
 
 public class GameMapScreen implements Screen {
@@ -110,6 +114,22 @@ public class GameMapScreen implements Screen {
             }
         }
 
+        Iterator<RayoJugador> iterRayos = jugadorSeleccionado.getNaveJugador().getRayos().iterator();
+        while (iterRayos.hasNext()) {
+            RayoJugador rayo = iterRayos.next();
+
+            Iterator<com.la35D2.game.enemigos.Enemigo> iterEnemigos = formacionEnemigos.getListaEnemigos().iterator();
+            while (iterEnemigos.hasNext()) {
+                com.la35D2.game.enemigos.Enemigo enemigo = iterEnemigos.next();
+
+                if (rayo.getBounds().overlaps(enemigo.getBounds())) {
+                    iterEnemigos.remove(); // Eliminar enemigo
+                    iterRayos.remove(); // Eliminar rayo
+                    break; // Salir del loop porque ya eliminamos el enemigo
+                }
+            }
+        }
+
     }
 
     @Override
@@ -136,3 +156,5 @@ public class GameMapScreen implements Screen {
         // Si la clase FormacionEnemigos tuviera recursos a liberar, se haría aquí
     }
 }
+
+

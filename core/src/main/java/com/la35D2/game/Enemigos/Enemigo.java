@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import com.badlogic.gdx.math.Rectangle;
 
+
 public class Enemigo {
     private float x, y;
     private float speed;
@@ -48,4 +49,5 @@ public class Enemigo {
     public Rectangle getBounds() {
         return new Rectangle(x, y, texture.getWidth() * scale, texture.getHeight() * scale);
     }
+
 }

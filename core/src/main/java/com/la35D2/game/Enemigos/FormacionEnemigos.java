@@ -61,7 +61,13 @@ public class FormacionEnemigos {
         }
     }
 
+    // Getter existente
     public ArrayList<com.la35D2.game.enemigos.Enemigo> getEnemigos() {
+        return enemigos;
+    }
+
+    // Nuevo método getter para usar en GameMapScreen
+    public ArrayList<com.la35D2.game.enemigos.Enemigo> getListaEnemigos() {
         return enemigos;
     }
 }

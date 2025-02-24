@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.la35D2.game.Globales;
+import com.badlogic.gdx.math.Rectangle;
+
+
 
 public class RayoJugador {
     private Sprite sprite;
@@ -32,5 +35,13 @@ public class RayoJugador {
 
     public void dispose() {
         sprite.getTexture().dispose();
+    }
+
+    public Rectangle getBounds() {
+        // Opción 1: Usando la posición y el tamaño del sprite
+        return new Rectangle(position.x, position.y, sprite.getWidth(), sprite.getHeight());
+
+        // Opción 2: Usar el método getBoundingRectangle() del Sprite
+        // return sprite.getBoundingRectangle();
     }
 }

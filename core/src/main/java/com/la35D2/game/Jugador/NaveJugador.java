@@ -58,4 +58,9 @@ public class NaveJugador {
         return sprite.getBoundingRectangle();
     }
 
+    public List<RayoJugador> getRayos() {
+        return rayos;
+    }
+
+
 }
