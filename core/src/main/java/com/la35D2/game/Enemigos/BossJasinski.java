@@ -70,7 +70,15 @@ public class BossJasinski {
 
     public Rectangle getBounds() {
         float escala = 4.0f;
-        return new Rectangle(x, y, texture.getWidth() * escala, texture.getHeight() * escala);
+        float reduccionAncho = 50; // Reducir el ancho del hitbox
+        float reduccionAlto = 300;  // Reducir el alto del hitbox
+
+        return new Rectangle(
+                x + reduccionAncho / 2,  // Desplazar para centrar el hitbox reducido
+                y + reduccionAlto / 2,
+                (texture.getWidth() * escala) - reduccionAncho,
+                (texture.getHeight() * escala) - reduccionAlto
+        );
     }
 
 
