@@ -1,4 +1,4 @@
-package com.la35D2.game.lwjgl3;
+package com.la35D2.game.lwjgl3 ;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -20,7 +20,7 @@ public class Lwjgl3Launcher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("La35-D2");
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
-        //// screen tearing. T h is setting doesn't always work on Linux, so the line after is a safeguard.
+        //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.
         configuration.useVsync(true);
         //// Limits FPS to the refresh rate of the currently active monitor, plus 1 to try to match fractional
         //// refresh rates. The Vsync setting above should limit the actual FPS to match the monitor.

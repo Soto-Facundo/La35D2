@@ -64,4 +64,6 @@ public class FormacionEnemigos {
     public ArrayList<com.la35D2.game.enemigos.Enemigo> getListaEnemigos() {
         return enemigos;
     }
+
+
 }

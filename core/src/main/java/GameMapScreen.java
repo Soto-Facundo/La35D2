@@ -22,6 +22,7 @@ public class GameMapScreen implements Screen {
     private Texture mapTexture;
     private com.la35D2.game.Player jugadorSeleccionado;
     private Texture rayoTexture;
+    private Texture rayoBossTexture;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -52,6 +53,7 @@ public class GameMapScreen implements Screen {
 
         mapTexture = new Texture(Gdx.files.internal("mapa-pixilart.png"));
         rayoTexture = new Texture(Gdx.files.internal("rayo1.png"));
+        rayoBossTexture = new Texture(Gdx.files.internal("rayoBoss.png"));
         bossTexture = new Texture(Gdx.files.internal("jBossFase.png"));
 
         float centerX = (Gdx.graphics.getWidth() - jugadorSeleccionado.getTexture().getWidth()) / 2;
@@ -86,39 +88,55 @@ public class GameMapScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+        // 📌 **Aquí agregamos la detección de colisiones**
+        Iterator<RayoJugador> iterRayos = jugadorSeleccionado.getNaveJugador().getRayos().iterator();
+        while (iterRayos.hasNext()) {
+            RayoJugador rayo = iterRayos.next();
+
+            // Verificar colisión con enemigos
+            Iterator<com.la35D2.game.enemigos.Enemigo> iterEnemigos = formacionEnemigos.getListaEnemigos().iterator();
+            while (iterEnemigos.hasNext()) {
+                com.la35D2.game.enemigos.Enemigo enemigo = iterEnemigos.next();
+
+                if (rayo.getBounds().overlaps(enemigo.getBounds())) {
+                    System.out.println("¡Colisión detectada! Enemigo eliminado.");
+                    iterEnemigos.remove(); // Elimina el enemigo
+
+                    if (formacionEnemigos.getListaEnemigos().isEmpty() && boss == null) {
+                        System.out.println("¡Todos los enemigos han sido derrotados! Aparece el Boss.");
+                        float bossY = Math.max(0, Math.min(MAP_HEIGHT - 100, MAP_HEIGHT - 370));
+                        boss = new BossJasinski(bossTexture, rayoBossTexture, MAP_WIDTH / 2, bossY);
+                        System.out.println("Boss Position -> X: " + boss.getX() + ", Y: " + boss.getY());
+                    }
+
+                    iterRayos.remove(); // Elimina el rayo
+                    break; // Salir del loop de enemigos para evitar errores
+                }
+            }
+
+            // **Nueva detección de colisión con el boss**
+            if (boss != null && rayo.getBounds().overlaps(boss.getBounds())) {
+                System.out.println("¡Disparo impactó al Boss!");
+                boss.recibirDisparo();
+                System.out.println("Vida restante del Boss: " + boss.getVida());
+                iterRayos.remove(); // Eliminar el rayo que impactó
+
+                if (boss.getVida() <= 0) {
+                    System.out.println("¡Boss eliminado!");
+                    boss = null;
+                }
+                break;
+            }
+        }
+
+        // 🔹 **Dibujar el mapa y los elementos en pantalla**
         batch.begin();
         batch.draw(mapTexture, 0, 0, MAP_WIDTH, MAP_HEIGHT);
         jugadorSeleccionado.getNaveJugador().draw();
         formacionEnemigos.draw(batch);
         batch.end();
 
-        for (com.la35D2.game.enemigos.Enemigo enemigo : formacionEnemigos.getListaEnemigos()) {
-            if (jugadorSeleccionado.getNaveJugador().getBounds().overlaps(enemigo.getBounds())) {
-                System.out.println("¡Colisión detectada! GAME OVER");
-                game.setScreen(new GameOverScreen(game));
-                break;
-            }
-        }
-
-        Iterator<RayoJugador> iterRayos = jugadorSeleccionado.getNaveJugador().getRayos().iterator();
-        while (iterRayos.hasNext()) {
-            RayoJugador rayo = iterRayos.next();
-            Iterator<com.la35D2.game.enemigos.Enemigo> iterEnemigos = formacionEnemigos.getListaEnemigos().iterator();
-            while (iterEnemigos.hasNext()) {
-                com.la35D2.game.enemigos.Enemigo enemigo = iterEnemigos.next();
-                if (rayo.getBounds().overlaps(enemigo.getBounds())) {
-                    iterEnemigos.remove();
-                    iterRayos.remove();
-                    break;
-                }
-            }
-        }
-
-        if (formacionEnemigos.getListaEnemigos().isEmpty() && boss == null) {
-            System.out.println("¡Todos los enemigos eliminados! Aparece el BossJasinski");
-            boss = new BossJasinski(bossTexture, MAP_WIDTH / 2 - 200, MAP_HEIGHT - 350);
-        }
-
+        // 🔹 **Dibujar el boss solo si está en la pantalla**
         if (boss != null) {
             boss.update(delta);
             batch.begin();
@@ -126,6 +144,8 @@ public class GameMapScreen implements Screen {
             batch.end();
         }
     }
+
+
 
     @Override
     public void resize(int width, int height) {
