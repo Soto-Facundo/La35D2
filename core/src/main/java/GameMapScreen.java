@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Input;
 import com.la35D2.game.enemigos.FormacionEnemigos;
+import com.la35D2.game.Jugador.NaveJugador;
+import com.la35D2.game.pantallas.GameOverScreen;
+
 
 public class GameMapScreen implements Screen {
     private La35D2 game;
@@ -94,6 +97,19 @@ public class GameMapScreen implements Screen {
         // Dibujar la formación de enemigos en movimiento
         formacionEnemigos.draw(batch);
         batch.end();
+
+        // Actualizar la formación de enemigos con la lógica de movimiento
+        formacionEnemigos.update(delta);
+
+// Comprobar colisiones entre la nave del jugador y cada enemigo
+        for (com.la35D2.game.enemigos.Enemigo enemigo : formacionEnemigos.getEnemigos()) {
+            if (jugadorSeleccionado.getNaveJugador().getBounds().overlaps(enemigo.getBounds())) {
+                System.out.println("¡Colisión detectada! GAME OVER");
+                game.setScreen(new GameOverScreen(game));
+                break;  // Opcional: detener el ciclo tras detectar la colisión
+            }
+        }
+
     }
 
     @Override

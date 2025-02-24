@@ -3,6 +3,8 @@ package com.la35D2.game.enemigos;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import com.badlogic.gdx.math.Rectangle;
+
 public class Enemigo {
     private float x, y;
     private float speed;
@@ -41,5 +43,9 @@ public class Enemigo {
 
     public void setY(float y) {
         this.y = y;
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, texture.getWidth() * scale, texture.getHeight() * scale);
     }
 }

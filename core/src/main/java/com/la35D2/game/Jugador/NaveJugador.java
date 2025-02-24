@@ -1,8 +1,12 @@
 package com.la35D2.game.Jugador;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.la35D2.game.Globales;
+
+import com.badlogic.gdx.math.Rectangle;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,4 +53,9 @@ public class NaveJugador {
             rayo.dispose();
         }
     }
+
+    public Rectangle getBounds() {
+        return sprite.getBoundingRectangle();
+    }
+
 }
